@@ -1,5 +1,15 @@
 const needle = require('needle')
 const axios = require('axios')
+const discord = require('discord.js') //Define the discord.js module
+const client = new discord.Client()
+
+// Get the prefix
+const prefix = '?'
+
+// ready event
+client.on('ready', () => {
+  console.log(`I am online. I am ${client.user.tag}`)
+})
 
 const rulesURL = 'https://api.twitter.com/2/tweets/search/stream/rules'
 const streamURL =
@@ -77,6 +87,7 @@ function streamTweets() {
     try {
       const json = JSON.parse(data)
       console.log(json)
+      discordSend(json)
       const params = {
         data: json,
       }
@@ -95,6 +106,27 @@ function streamTweets() {
   return stream
 }
 
+const channels = {
+  Fxhedgers: '767952991906037780',
+  spectatorindex: '767952991906037780',
+  TheEconomist: '767953095245168680',
+  WallStJesus: '767953095245168680',
+  zerohedge: '762394938666254366',
+  MarketCurrents: '767953691633778708',
+  SeekingAlpha: '767953691633778708',
+  eWhispers: '762377815680090193',
+  IPOBoutique: '772245318870892544',
+  CNNBusiness: '707040857487835227',
+}
+
+const discordSend = async (data) => {
+  const checkChannel = channels[data.includes.users[0].username]
+  console.log(checkChannel)
+  const guild = await client.guilds.cache.get('682259216861626378')
+  const channel = await guild.channels.cache.get(checkChannel)
+  channel.send(data.data.text)
+}
+
 ;(async () => {
   let currentRules
   try {
@@ -110,3 +142,6 @@ function streamTweets() {
 
   streamTweets()
 })()
+
+// Log in with the API KEY
+client.login('OTQwMzExNjU1NDAzOTEzMjI2.YgFjeA.I6to9NqiCL1wpeigB7u1-VL0jjs')
